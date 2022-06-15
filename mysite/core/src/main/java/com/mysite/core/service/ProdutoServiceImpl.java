@@ -1,17 +1,24 @@
 package com.mysite.core.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.mysite.core.config.exceptions.IdNotFoundException;
+import com.mysite.core.config.exceptions.InvalidValueException;
+import com.mysite.core.config.exceptions.NullValueException;
 import com.mysite.core.dao.ProdutoDAO;
-import com.mysite.core.models.Parameter;
+import com.mysite.core.models.Cliente;
+import com.mysite.core.models.IdList;
 import com.mysite.core.models.Produto;
+import org.apache.sling.api.SlingHttpServletRequest;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static com.mysite.core.utils.BuildResponse.*;
 
 @Component(immediate = true, service = ProdutoService.class)
 public class ProdutoServiceImpl implements ProdutoService{
@@ -20,6 +27,11 @@ public class ProdutoServiceImpl implements ProdutoService{
     private DatabaseService databaseService;
     @Reference
     private ProdutoDAO produtoDAO;
+    static final String CATEGORIA = "categoria";
+    static final String ID = "id";
+    static final String NOME = "nome";
+    static final String PRECO = "preco";
+    static final String PRODUTO = "Produto";
 
 
     @Override
@@ -28,33 +40,75 @@ public class ProdutoServiceImpl implements ProdutoService{
     }
 
     @Override
-    public Produto findProdutoById(int id) {
-        return produtoDAO.findProdutoById(id);
+    public Produto getProdutoById(int id) {
+        return produtoDAO.getProdutoById(id);
     }
 
     @Override
     public Produto postProduto(Produto produto) {return produtoDAO.postProduto(produto);}
 
-
     @Override
-    public String strToJson(Object object) {
-        Gson gson = new Gson();
-        String json = gson.toJson(object);
-        return json;
+    public List<Produto> findProdutoByName(String name) {
+        return produtoDAO.findProdutoByName(name);
     }
 
     @Override
-    public Produto parameterFilter(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            Produto produto = new Produto();
-            List<Parameter> parameters = mapper.readValue(json, new TypeReference<List<Parameter>>() {});
-            for (Parameter parameter : parameters) {
-                if (parameter.getName().matches("id")) {
-                    produto = findProdutoById(Integer.parseInt(parameter.getValue()));
-                }
+    public List<Produto> sortProdutoByPreco() {return produtoDAO.sortProdutoByPreco();}
+
+    @Override
+    public List<Produto> parameterFilter(SlingHttpServletRequest request){
+        List<Produto> produtos = new ArrayList<>();
+        String parameter = "";
+        if(request.getParameter(ID)!=null){
+            try{
+                produtos.add(getProdutoById(Integer.parseInt(request.getParameter(ID))));
+                if(produtos.isEmpty()) throw new NullValueException(idNotFound(request.getParameter(ID),PRODUTO,""));
+                return produtos;
+            }catch (Exception e){throw new InvalidValueException(invalidInput(request.getParameter(ID)));}
+        }else if(request.getParameter(CATEGORIA)!=null){
+            produtos = produtoDAO.findProdutoByCategory(request.getParameter(CATEGORIA));
+            if(!produtos.isEmpty()) return produtos;
+            else parameter=CATEGORIA;
+        }else if(request.getParameter(NOME)!=null){
+            produtos = produtoDAO.findProdutoByName(request.getParameter(NOME));
+            if(!produtos.isEmpty()) return produtos;
+            else parameter=NOME;
+        }else if(request.getParameter(PRECO)!=null){
+            return produtoDAO.sortProdutoByPreco();
+        }
+        throw new NullValueException(noResultsFound(request.getParameter(parameter)));
+    }
+
+    @Override
+    public void deleteProdutoById(Integer id) {produtoDAO.deleteProdutoById(id);}
+
+    @Override
+    public Produto updateProduto(Produto produto, int id) {
+        return produtoDAO.updateProduto(produto,id);
+    }
+
+    @Override
+    public List<Integer> idListOrObject(String listOrObject){
+        List<Integer> ids = new ArrayList<>();
+        try{
+            List<IdList> list = new Gson().fromJson(listOrObject, new TypeToken<List<IdList>>(){}.getType());
+            for(IdList idList : list){
+                if(idChecker(idList.getId())) ids.add(idList.getId());
             }
-            return produto;
-        }catch (Exception e){throw new IllegalStateException(e.getMessage());}
+        }catch (JsonSyntaxException e){
+            IdList idList = new Gson().fromJson(listOrObject, IdList.class);
+            if(idChecker(idList.getId())) ids.add(idList.getId());
+        }catch (NullPointerException e){throw new InvalidValueException(invalidPayloadDetailed(PRODUTO,ID));}
+        return ids;
     }
+
+    @Override
+    public boolean idChecker(Integer id){
+        try {
+            Produto produto = produtoDAO.getProdutoById(id);
+            if (produto.getId() == null) throw new IdNotFoundException(idNotFound(String.valueOf(id), PRODUTO, ""));
+            return true;
+        }catch (NullPointerException e){throw new InvalidValueException(invalidPayloadDetailed(PRODUTO,ID));}
+    }
+
 }

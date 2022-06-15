@@ -7,16 +7,12 @@ import lombok.ToString;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.models.annotations.Model;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Model(adaptables = {Resource.class})
-public class Parameter {
-    private String value;
-    private List<Integer> content;
-    private String name;
-    private String encoding;
+public class IdList {
+
+    private Integer id;
 }
