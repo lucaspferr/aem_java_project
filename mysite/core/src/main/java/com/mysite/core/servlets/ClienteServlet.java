@@ -70,7 +70,7 @@ public class ClienteServlet extends SlingAllMethodsServlet {
                 clientes.add(clienteService.postCliente(cliente));
             }
             if (clientes.size() > 1) buildResponse(response, SC_CREATED, new Gson().toJson(clientes));
-            else if (clientes.size() == 1) buildResponse(response, SC_CREATED, new Gson().toJson(clientes.get(0)));
+            else buildResponse(response, SC_CREATED, new Gson().toJson(clientes.get(0)));
 
         }catch (InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
         catch (Exception e){buildResponse(response,SC_BAD_REQUEST,invalidPayload(CLIENTE));}
@@ -111,5 +111,6 @@ public class ClienteServlet extends SlingAllMethodsServlet {
 
         }catch (IdNotFoundException e){buildResponse(response,SC_NOT_FOUND,e.getMessage());}
         catch(InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
+        catch (Exception e){buildResponse(response,SC_BAD_REQUEST,invalidPayload(CLIENTE));}
     }
 }

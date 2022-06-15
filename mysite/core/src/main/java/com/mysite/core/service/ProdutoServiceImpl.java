@@ -48,14 +48,6 @@ public class ProdutoServiceImpl implements ProdutoService{
     public Produto postProduto(Produto produto) {return produtoDAO.postProduto(produto);}
 
     @Override
-    public List<Produto> findProdutoByName(String name) {
-        return produtoDAO.findProdutoByName(name);
-    }
-
-    @Override
-    public List<Produto> sortProdutoByPreco() {return produtoDAO.sortProdutoByPreco();}
-
-    @Override
     public List<Produto> parameterFilter(SlingHttpServletRequest request){
         List<Produto> produtos = new ArrayList<>();
         String parameter = "";
@@ -83,8 +75,8 @@ public class ProdutoServiceImpl implements ProdutoService{
     public void deleteProdutoById(Integer id) {produtoDAO.deleteProdutoById(id);}
 
     @Override
-    public Produto updateProduto(Produto produto, int id) {
-        return produtoDAO.updateProduto(produto,id);
+    public Produto putProduto(Produto produto) {
+        return produtoDAO.putProduto(produto);
     }
 
     @Override
@@ -111,4 +103,35 @@ public class ProdutoServiceImpl implements ProdutoService{
         }catch (NullPointerException e){throw new InvalidValueException(invalidPayloadDetailed(PRODUTO,ID));}
     }
 
+    @Override
+    public List<Produto> produtoListOrObject(String listOrObject) {
+        List<Produto> produtos = new ArrayList<>();
+        try{
+            List<Produto> list = new Gson().fromJson(listOrObject, new TypeToken<List<Produto>>(){}.getType());
+            produtos = list;
+        }catch (JsonSyntaxException e){
+            Produto produto = new Gson().fromJson(listOrObject, Produto.class);
+            produtos.add(produto);
+        }catch (Exception e){throw new InvalidValueException(invalidPayload(PRODUTO));}
+
+        return objectChecker(produtos);
+    }
+
+    @Override
+    public List<Produto> objectChecker(List<Produto> produtos) {
+        for(Produto produto : produtos){
+            if(produto.getNome()==null || produto.getNome().isEmpty()) throw new InvalidValueException(invalidPayloadDetailed(PRODUTO,NOME));
+            if(produto.getCategoria()==null || produto.getCategoria().isEmpty()) throw new InvalidValueException(invalidPayloadDetailed(PRODUTO,CATEGORIA));
+            if(produto.getPreco()==null) throw new InvalidValueException(invalidPayloadDetailed(PRODUTO,PRECO));
+        }
+        return produtos;
+    }
+
+    @Override
+    public List<Produto> updateChecker(List<Produto> produtos) {
+        for(Produto produto : produtos){
+            idChecker(produto.getId());
+        }
+        return produtos;
+    }
 }

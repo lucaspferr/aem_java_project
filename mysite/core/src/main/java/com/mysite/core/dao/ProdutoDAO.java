@@ -13,6 +13,6 @@ public interface ProdutoDAO {
     List<Produto> sortProdutoByPreco();
     List<Produto> findProdutoByCategory(String category);
     void deleteProdutoById(int id);
-    Produto updateProduto(Produto produto, int id);
+    Produto putProduto(Produto produto);
 
 }

@@ -13,18 +13,20 @@ public interface ProdutoService {
 
     Produto postProduto(Produto produto);
 
-    List<Produto> findProdutoByName(String name);
-
-    List<Produto> sortProdutoByPreco();
-
     List<Produto> parameterFilter(SlingHttpServletRequest request);
 
     void deleteProdutoById(Integer id);
 
-    Produto updateProduto(Produto produto, int id);
+    Produto putProduto(Produto produto);
 
     List<Integer> idListOrObject(String listOrObject);
 
     boolean idChecker(Integer id);
+
+    List<Produto> produtoListOrObject(String listOrObject);
+
+    List<Produto> objectChecker(List<Produto> produtos);
+
+    List<Produto> updateChecker(List<Produto> produtos);
 
 }

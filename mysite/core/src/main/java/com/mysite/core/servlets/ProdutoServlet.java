@@ -23,6 +23,7 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mysite.core.utils.BuildResponse.*;
@@ -69,25 +70,20 @@ public class ProdutoServlet extends SlingAllMethodsServlet {
 
     @Override
     protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        try {
+        try{
             String body = request.getReader().lines().reduce("", (acc, curr) -> acc + curr);
-            String json = "";
-            if (body.contains("[")) {
-                List<Produto> produtos = gson.fromJson(body, new TypeToken<List<Produto>>() {
-                }.getType());
-                for (Produto produto : produtos) {
-                    produtoService.postProduto(produto);
-                }
-                json = gson.toJson(produtos);
-            } else {
-                Produto produto = gson.fromJson(body, Produto.class);
-                produtoService.postProduto(produto);
-                json = gson.toJson(produto);
+            if(body.isEmpty()) throw new InvalidValueException(invalidPayload(PRODUTO));
+            List<Produto> produtos = new ArrayList<>();
+
+            for(Produto produto : produtoService.produtoListOrObject(body)){
+                produtos.add(produtoService.postProduto(produto));
             }
-            buildResponse(response, SC_CREATED, json);
-        } catch (Exception e) {
-            buildResponse(response, SC_INTERNAL_SERVER_ERROR, invalidPayload(PRODUTO));
-        }
+
+            if(produtos.size() > 1) buildResponse(response, SC_CREATED, new Gson().toJson(produtos));
+            else buildResponse(response, SC_CREATED, new Gson().toJson(produtos.get(0)));
+        }catch (InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
+        catch (Exception e){buildResponse(response,SC_BAD_REQUEST,invalidPayload(PRODUTO));}
+
     }
 
     @Override
@@ -102,44 +98,26 @@ public class ProdutoServlet extends SlingAllMethodsServlet {
             buildResponse(response, SC_NO_CONTENT, "");
         }catch (IdNotFoundException e){buildResponse(response,SC_NOT_FOUND,e.getMessage());}
         catch (InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
-//        String idsDeleted = "";
-//        String idNotFound = "";
-//        try {
-//            //Ate o momento, o servlet apaga multiplos produtos apenas pelo envio do param no formato id=1,2,3 , por exemplo
-//            RequestParameter id = request.getRequestParameter("id");
-//            if (id.getString().isEmpty()) throw new NullValueException(nullParameter(ID));
-//            String[] param = id.getString().split(",");
-//            for (String s : param) {
-//                idNotFound = s;
-//                produtoService.deleteProdutoById(s);
-//                if (idsDeleted.isEmpty()) idsDeleted = s;
-//                else idsDeleted = new StringBuilder().append(idsDeleted).append(",").append(s).toString();
-//            }
-//            buildResponse(response, SC_NO_CONTENT, "");
-//
-//        } catch (InvalidValueException e) {
-//            buildResponse(response, SC_BAD_REQUEST, e.getMessage());
-//        } catch (IllegalStateException e) {
-//            buildResponse(response, SC_BAD_REQUEST, idNotFound(idNotFound, PRODUTO, idsDeleted));
-//        } catch (NullPointerException e) {
-//            buildResponse(response, SC_BAD_REQUEST, badRequest(request.getQueryString()));
-//        }
+        catch(Exception e){buildResponse(response,SC_BAD_REQUEST,invalidPayload(PRODUTO));}
     }
 
     @Override
     protected void doPut(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws ServletException, IOException {
+        try{
+            String body = request.getReader().lines().reduce("", (acc, curr) -> acc + curr);
+            if(body.isEmpty()) throw new InvalidValueException(invalidPayload(PRODUTO));
+            List<Produto> produtos = new ArrayList<>();
 
+            produtoService.updateChecker(produtoService.produtoListOrObject(body));
+            for(Produto produto : produtoService.produtoListOrObject(body)){
+                produtos.add(produtoService.putProduto(produto));
+            }
 
+            if(produtos.size() > 1) buildResponse(response, SC_CREATED, new Gson().toJson(produtos));
+            else buildResponse(response, SC_CREATED, new Gson().toJson(produtos.get(0)));
 
-//        try {
-//            Produto produto = new ObjectMapper().readValue(request.getReader(), Produto.class);
-//            produto = produtoService.updateProduto(produto, Integer.parseInt(request.getParameter("id")));
-//            if (produto.getId() == null) {buildResponse(response, SC_NOT_FOUND, idNotFound(request.getParameter("id"), PRODUTO, ""));}
-//            else buildResponse(response, SC_CREATED, gson.toJson(produto));
-//        } catch (UnrecognizedPropertyException | NullValueException e) {
-//            buildResponse(response, SC_BAD_REQUEST, invalidPayload(PRODUTO));
-//        }catch (Exception e) {
-//            buildResponse(response, SC_BAD_REQUEST, badRequest(request.getQueryString()));
-//        }
+        }catch (InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
+        catch (IdNotFoundException e){buildResponse(response,SC_NOT_FOUND,e.getMessage());}
+        catch(Exception e){buildResponse(response,SC_BAD_REQUEST,invalidPayload(PRODUTO));}
     }
 }

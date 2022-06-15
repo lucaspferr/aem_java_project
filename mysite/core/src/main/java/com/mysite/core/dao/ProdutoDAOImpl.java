@@ -158,21 +158,20 @@ public class ProdutoDAOImpl implements ProdutoDAO{
             try(PreparedStatement pstm = connection.prepareStatement(sql)){
                 pstm.setInt(1,id);
                 pstm.execute();
-                if(pstm.getUpdateCount() == 0) throw new SQLException();
             }
         }catch (SQLException e){throw new IllegalStateException();}}
 
     @Override
-    public Produto updateProduto(Produto produto, int id) {
+    public Produto putProduto(Produto produto) {
         String sql = "UPDATE produto P SET P.nome = ?, P.categoria= ?, P.preco = ? WHERE P.id = ?";
         try(Connection connection = databaseService.getConnection()){
             try(PreparedStatement pstm = connection.prepareStatement(sql)){
                 pstm.setString(1, produto.getNome());
                 pstm.setString(2, produto.getCategoria());
                 pstm.setDouble(3,produto.getPreco());
-                pstm.setInt(4,id);
+                pstm.setInt(4,produto.getId());
                 pstm.execute();
-                if(pstm.getUpdateCount() > 0) produto.setId(id);
+
                 return produto;
             }
 
