@@ -26,7 +26,7 @@ public class NotaFiscalDAOImpl implements NotaFiscalDAO {
 
     static final String NUMERO = "numero";
     static final String NOTAFISCAL = "Nota fiscal";
-    static final String SQL_GENERICS = "SELECT nf.numero, cl.nome AS cliente, pr.nome AS produto, nf.valor FROM nota_teste AS nf " +
+    static final String SQL_GENERICS = "SELECT nf.numero, cl.nome AS cliente, pr.nome AS produto, nf.valor FROM nota_fiscal AS nf " +
             "INNER JOIN produto AS pr ON pr.id = nf.idproduto " +
             "INNER JOIN cliente AS cl ON cl.id = nf.idcliente ";
     static final String SQL_NUMERO = SQL_GENERICS + "WHERE nf.numero = ?";
@@ -69,7 +69,7 @@ public class NotaFiscalDAOImpl implements NotaFiscalDAO {
             try(ResultSet rst = pstm.getResultSet()){
                 while (rst.next()){
                     notaFiscal.setValor(rst.getDouble(1));}}
-            sql = "INSERT INTO nota_teste (numero, idcliente, idproduto, valor) VALUES (?,?,?,?)";
+            sql = "INSERT INTO nota_fiscal (numero, idcliente, idproduto, valor) VALUES (?,?,?,?)";
             PreparedStatement pstm2 = connection.prepareStatement(sql);
             pstm2.setInt(1, notaFiscal.getNumero());
             pstm2.setInt(2, notaFiscal.getIdcliente());

@@ -9,6 +9,7 @@ import org.osgi.service.component.annotations.Reference;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component(immediate = true, service = ProdutoDAO.class)
 public class ProdutoDAOImpl implements ProdutoDAO{
@@ -84,6 +85,7 @@ public class ProdutoDAOImpl implements ProdutoDAO{
     public List<Produto> findProdutoByName(String name) {
         try(Connection connection = databaseService.getConnection()){
             String sql = "SELECT * FROM produto WHERE nome LIKE ?";
+            name = name.toLowerCase();
 
             try(PreparedStatement pstm = connection.prepareStatement(sql)){
                 name = "%"+name+"%";
@@ -133,6 +135,7 @@ public class ProdutoDAOImpl implements ProdutoDAO{
         try(Connection connection = databaseService.getConnection()){
             String sql = "SELECT * FROM produto WHERE category = ?";
             List<Produto> produtos = new ArrayList<>();
+            category = category.toLowerCase();
 
             try(PreparedStatement pstm = connection.prepareStatement(sql)){
                 pstm.setString(1,category);
