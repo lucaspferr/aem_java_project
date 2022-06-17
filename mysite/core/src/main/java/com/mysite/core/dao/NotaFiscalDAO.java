@@ -8,5 +8,7 @@ public interface NotaFiscalDAO {
 
     NotaFiscalDto getNotaFiscal(Integer id, String identifier);
 
+    NotaFiscal postNotaFiscal(NotaFiscal notaFiscal);
+
 
 }

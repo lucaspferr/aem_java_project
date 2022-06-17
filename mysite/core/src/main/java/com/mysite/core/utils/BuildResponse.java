@@ -27,11 +27,8 @@ public class BuildResponse {
         return "{\"input\":\""+input+"\",\"message\":\"Invalid input\"}";
     }
 
-    public static String badRequest(String error){
-        try {
-            String[] errorArray = error.split("=");
-            return "{\"parameter\":\"" + errorArray[0] + "\",\"value\":\"" + errorArray[1] + "\",\"message\":\"Invalid request\"}";
-        }catch (Exception e){return "{\"parameter\":\""+error+"\",\"message\":\"Invalid request\"}";}
+    public static String postFailed(String message){
+        return "{\"exception\":\""+"SQL Integrity Constraint Violation "+"\",\"message\":\""+message+"\"}";
     }
 
     public static String invalidPayload(String entity){

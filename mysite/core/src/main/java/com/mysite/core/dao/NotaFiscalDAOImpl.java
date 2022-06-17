@@ -2,7 +2,8 @@ package com.mysite.core.dao;
 
 
 import com.mysite.core.config.exceptions.IdNotFoundException;
-import com.mysite.core.models.Cliente;
+import com.mysite.core.config.exceptions.PostException;
+import com.mysite.core.models.NotaFiscal;
 import com.mysite.core.models.NotaFiscalDto;
 import com.mysite.core.service.DatabaseService;
 import com.mysite.core.utils.BuildResponse;
@@ -12,11 +13,9 @@ import org.osgi.service.component.annotations.Reference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mysite.core.utils.BuildResponse.invalidInput;
 
 
 @Component(immediate = true, service = NotaFiscalDAO.class)
@@ -60,5 +59,25 @@ public class NotaFiscalDAOImpl implements NotaFiscalDAO {
             return notaFiscalDto;
         }catch (Exception e){throw new IdNotFoundException(BuildResponse.idNotFound((identifier+" "+id),NOTAFISCAL,""));}}
 
+    @Override
+    public NotaFiscal postNotaFiscal(NotaFiscal notaFiscal) {
+        String sql = "SELECT preco FROM produto WHERE id = ?";
+        try(Connection connection = databaseService.getConnection();
+            PreparedStatement pstm = connection.prepareStatement(sql)){
+            pstm.setInt(1, notaFiscal.getIdproduto());
+            pstm.execute();
+            try(ResultSet rst = pstm.getResultSet()){
+                while (rst.next()){
+                    notaFiscal.setValor(rst.getDouble(1));}}
+            sql = "INSERT INTO nota_teste (numero, idcliente, idproduto, valor) VALUES (?,?,?,?)";
+            PreparedStatement pstm2 = connection.prepareStatement(sql);
+            pstm2.setInt(1, notaFiscal.getNumero());
+            pstm2.setInt(2, notaFiscal.getIdcliente());
+            pstm2.setInt(3, notaFiscal.getIdproduto());
+            pstm2.setDouble(4, notaFiscal.getValor());
+            pstm2.execute();
+            return notaFiscal;
 
+        }catch (Exception e){throw new PostException(e.getMessage());}
+    }
 }

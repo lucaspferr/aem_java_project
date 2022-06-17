@@ -16,8 +16,8 @@ import org.apache.sling.models.annotations.Model;
 public class NotaFiscal {
 
     private Integer numero;
-    private Integer idProduto;
-    private Integer idCliente;
+    private Integer idproduto;
+    private Integer idcliente;
     private Double valor;
 
 }

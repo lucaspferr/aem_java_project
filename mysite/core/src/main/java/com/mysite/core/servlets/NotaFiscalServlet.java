@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import com.mysite.core.config.exceptions.IdNotFoundException;
 import com.mysite.core.config.exceptions.InvalidValueException;
 import com.mysite.core.config.exceptions.NullValueException;
+import com.mysite.core.config.exceptions.PostException;
+import com.mysite.core.models.NotaFiscal;
 import com.mysite.core.models.NotaFiscalDto;
+import com.mysite.core.models.Produto;
 import com.mysite.core.service.NotaFiscalService;
 import com.mysite.core.utils.BuildResponse;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -18,6 +21,8 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mysite.core.utils.BuildResponse.*;
 import static com.mysite.core.utils.BuildResponse.buildResponse;
@@ -38,6 +43,7 @@ public class NotaFiscalServlet extends SlingAllMethodsServlet {
     static final String PARAMETER = "Número da Nota ou ID do Cliente";
     static final String NUMERO = "numero";
     static final String IDCLIENTE = "idcliente";
+    static final String NOTA_FISCAL = "Nota Fiscal";
 
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws ServletException, IOException {
@@ -55,6 +61,19 @@ public class NotaFiscalServlet extends SlingAllMethodsServlet {
 
     @Override
     protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws ServletException, IOException {
-        super.doPost(request, response);
+        try{
+            String body = request.getReader().lines().reduce("", (acc, curr) -> acc + curr);
+            if(body.isEmpty()) throw new InvalidValueException(invalidPayload(NOTA_FISCAL));
+            List<NotaFiscal> notaFiscalList = new ArrayList<>();
+
+            for(NotaFiscal notaFiscal : notaFiscalService.notaFiscalListOrObject(body)){
+                notaFiscalList.add(notaFiscalService.postNotaFiscal(notaFiscal));
+            }
+
+            if(notaFiscalList.size() > 1) buildResponse(response, SC_CREATED, new Gson().toJson(notaFiscalList));
+            else buildResponse(response, SC_CREATED, new Gson().toJson(notaFiscalList.get(0)));
+        }catch (InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
+        catch (PostException e){buildResponse(response,SC_INTERNAL_SERVER_ERROR,postFailed(e.getMessage()));}
+        catch (Exception e){buildResponse(response,SC_BAD_REQUEST,invalidPayload(NOTA_FISCAL));}
     }
 }
