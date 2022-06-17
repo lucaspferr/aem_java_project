@@ -39,7 +39,6 @@ public class ProdutoServlet extends SlingAllMethodsServlet {
     @Reference
     private ProdutoService produtoService;
 
-    private Gson gson = new Gson();
     static final String PRODUTO = "Produto";
     static final String ID = "id";
 
@@ -48,12 +47,9 @@ public class ProdutoServlet extends SlingAllMethodsServlet {
         try {
             String param = request.getQueryString();
             List<Produto> produtos;
-            if (!param.isEmpty() || !param.equals("")) {
-                produtos = produtoService.parameterFilter(request);
-            } else {
-                produtos = produtoService.getProdutos();
-            }
-            String json = gson.toJson(produtos);
+            if(param==null) produtos = produtoService.getProdutos();
+            else produtos = produtoService.parameterFilter(request);
+            String json = new Gson().toJson(produtos);
             if (produtos.size() == 1) json = json.substring(1, json.length() - 1);
             buildResponse(response, SC_OK, json);
         } catch (NullValueException e) {
