@@ -39,24 +39,19 @@ public class ClienteServlet extends SlingAllMethodsServlet {
 
 
     static final String CLIENTE = "Cliente";
+    static final String ID = "id";
 
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws ServletException, IOException {
         try {
-            String body = request.getReader().lines().reduce("", (acc, line) -> acc + line);
-            List<Cliente> clientes = new ArrayList<>();
-            if (body.isEmpty()) {
-                clientes = clienteService.getClientes();
-            } else {
-                List<Integer> ids = clienteService.idListOrObject(body);
-                for (Integer id : ids) {
-                    clientes.add(clienteService.getClienteById(id));
-                }
+            if(request.getQueryString()==null) buildResponse(response, SC_OK, new Gson().toJson(clienteService.getClientes()));
+            else {
+                Integer id = Integer.parseInt(request.getParameter(ID));
+                clienteService.idChecker(id);
+                buildResponse(response, SC_OK, new Gson().toJson(clienteService.getClienteById(id)));
             }
-            if (clientes.size() > 1) buildResponse(response, SC_OK, new Gson().toJson(clientes));
-            else if (clientes.size() == 1) buildResponse(response, SC_OK, new Gson().toJson(clientes.get(0)));
         }catch (IdNotFoundException e){buildResponse(response,SC_NOT_FOUND,e.getMessage());}
-        catch(InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
+        catch (NumberFormatException e){buildResponse(response,SC_BAD_REQUEST,invalidInput(request.getParameter(ID)));}
     }
 
     @Override
