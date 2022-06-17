@@ -42,8 +42,8 @@ public class BuildResponse {
         return "{\"entity\":\""+entity+"\",\"parameter\":\""+parameter+"\",\"message\":\"Invalid payload\"}";
     }
 
-    public static String nullParameter(String parameter){
-        return "{\"parameter\":\""+parameter+"\",\"message\":\"Missing value in parameter\"}";
+    public static String parameterException(String parameter){
+        return "{\"parameter\":\""+parameter+"\",\"message\":\"Missing parameter and/or value\"}";
     }
 
 }

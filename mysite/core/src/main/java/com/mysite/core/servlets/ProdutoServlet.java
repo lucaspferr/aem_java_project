@@ -1,19 +1,15 @@
 package com.mysite.core.servlets;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.mysite.core.config.exceptions.IdNotFoundException;
 import com.mysite.core.config.exceptions.InvalidValueException;
 import com.mysite.core.config.exceptions.NullValueException;
-import com.mysite.core.models.Cliente;
 import com.mysite.core.models.Produto;
 import com.mysite.core.service.ProdutoService;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
-import org.apache.sling.api.request.RequestParameter;
 import org.apache.sling.api.servlets.HttpConstants;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.osgi.service.component.annotations.Component;
