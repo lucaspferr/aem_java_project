@@ -1,6 +1,7 @@
-package com.mysite.core.service;
+package com.mysite.core.service.impl;
 
 import com.day.commons.datasource.poolservice.DataSourcePool;
+import com.mysite.core.service.DatabaseService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;

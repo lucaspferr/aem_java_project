@@ -9,11 +9,12 @@ import java.util.List;
 
 public interface NotaFiscalService {
 
-    NotaFiscalDto getNotaFiscal(SlingHttpServletRequest request, String parameter);
+    List<NotaFiscalDto> getNotaFiscal(SlingHttpServletRequest request, String parameter);
 
     List<NotaFiscal> notaFiscalListOrObject(String listOrObject);
 
     void objectChecker(List<NotaFiscal> notaFiscalList);
 
     NotaFiscal postNotaFiscal(NotaFiscal notaFiscal);
+
 }

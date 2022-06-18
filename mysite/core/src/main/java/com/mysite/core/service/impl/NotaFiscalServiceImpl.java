@@ -1,4 +1,4 @@
-package com.mysite.core.service;
+package com.mysite.core.service.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -7,7 +7,8 @@ import com.mysite.core.config.exceptions.InvalidValueException;
 import com.mysite.core.dao.NotaFiscalDAO;
 import com.mysite.core.models.NotaFiscal;
 import com.mysite.core.models.NotaFiscalDto;
-import com.mysite.core.models.Produto;
+import com.mysite.core.service.DatabaseService;
+import com.mysite.core.service.NotaFiscalService;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.Component;
@@ -30,17 +31,6 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
     static final String IDCLIENTE = "idcliente";
     static final String IDPRODUTO = "idproduto";
     static final String NOTAFISCAL = "Nota Fiscal";
-
-    @Override
-    public NotaFiscalDto getNotaFiscal(SlingHttpServletRequest request, String parameter){
-        try {
-            NotaFiscalDto notaFiscalDto = new NotaFiscalDto();
-            Integer identifier = Integer.parseInt(parameter);
-            if (request.getParameter(NUMERO) == null) notaFiscalDto = notaFiscalDAO.getNotaFiscal(identifier,IDCLIENTE);
-            else notaFiscalDto = notaFiscalDAO.getNotaFiscal(identifier,NUMERO);
-            return notaFiscalDto;
-        }catch (NumberFormatException e){throw new InvalidValueException(invalidInput(parameter));}
-    }
 
     @Override
     public List<NotaFiscal> notaFiscalListOrObject(String listOrObject) {
@@ -70,5 +60,16 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
     @Override
     public NotaFiscal postNotaFiscal(NotaFiscal notaFiscal) {
         return notaFiscalDAO.postNotaFiscal(notaFiscal);
+    }
+
+    @Override
+    public List<NotaFiscalDto> getNotaFiscal(SlingHttpServletRequest request, String parameter) {
+        try {
+            List<NotaFiscalDto> notaFiscalDtoList;
+            Integer identifier = Integer.parseInt(parameter);
+            if (request.getParameter(NUMERO) == null) notaFiscalDtoList = notaFiscalDAO.getNotaFiscal(identifier,IDCLIENTE);
+            else notaFiscalDtoList = notaFiscalDAO.getNotaFiscal(identifier,NUMERO);
+            return notaFiscalDtoList;
+        }catch (NumberFormatException e){throw new InvalidValueException(invalidInput(parameter));}
     }
 }

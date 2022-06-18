@@ -1,6 +1,7 @@
-package com.mysite.core.dao;
+package com.mysite.core.dao.impl;
 
 import com.mysite.core.config.exceptions.NullValueException;
+import com.mysite.core.dao.ProdutoDAO;
 import com.mysite.core.models.Produto;
 import com.mysite.core.service.DatabaseService;
 import org.osgi.service.component.annotations.Component;

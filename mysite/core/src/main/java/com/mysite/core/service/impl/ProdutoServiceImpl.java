@@ -1,4 +1,4 @@
-package com.mysite.core.service;
+package com.mysite.core.service.impl;
 
 
 import com.google.gson.Gson;
@@ -11,6 +11,8 @@ import com.mysite.core.dao.ProdutoDAO;
 import com.mysite.core.models.Cliente;
 import com.mysite.core.models.IdList;
 import com.mysite.core.models.Produto;
+import com.mysite.core.service.DatabaseService;
+import com.mysite.core.service.ProdutoService;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

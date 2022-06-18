@@ -1,4 +1,4 @@
-package com.mysite.core.service;
+package com.mysite.core.service.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -8,6 +8,8 @@ import com.mysite.core.config.exceptions.InvalidValueException;
 import com.mysite.core.dao.ClienteDAO;
 import com.mysite.core.models.Cliente;
 import com.mysite.core.models.IdList;
+import com.mysite.core.service.ClienteService;
+import com.mysite.core.service.DatabaseService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 

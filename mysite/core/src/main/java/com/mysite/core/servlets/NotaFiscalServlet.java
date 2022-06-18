@@ -49,9 +49,10 @@ public class NotaFiscalServlet extends SlingAllMethodsServlet {
             String parameter = request.getParameter(NUMERO);
             if(parameter == null) parameter = request.getParameter(IDCLIENTE);
             if(parameter == null) throw new NullValueException(parameterException(PARAMETER));
-            NotaFiscalDto notaFiscal = notaFiscalService.getNotaFiscal(request, parameter);
+            List<NotaFiscalDto> notas = notaFiscalService.getNotaFiscal(request, parameter);
 
-            buildResponse(response, SC_OK, new Gson().toJson(notaFiscal));
+            if(notas.size() == 1)buildResponse(response, SC_OK, new Gson().toJson(notas.get(0)));
+            else buildResponse(response, SC_OK, new Gson().toJson(notas));
         }catch (NullValueException | NullPointerException e){buildResponse(response, SC_BAD_REQUEST, e.getMessage());}
         catch (InvalidValueException e){buildResponse(response, SC_BAD_REQUEST, e.getMessage());}
         catch(IdNotFoundException e){buildResponse(response, SC_NOT_FOUND, e.getMessage());}
