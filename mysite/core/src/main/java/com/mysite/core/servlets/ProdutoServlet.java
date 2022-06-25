@@ -12,6 +12,7 @@ import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.HttpConstants;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -36,8 +37,12 @@ import static org.apache.sling.api.servlets.ServletResolverConstants.*;
 })
 public class ProdutoServlet extends SlingAllMethodsServlet {
 
-    @Reference
-    private ProdutoService produtoService;
+    private final ProdutoService produtoService;
+
+    @Activate
+    public ProdutoServlet(@Reference ProdutoService produtoService) {
+        this.produtoService = produtoService;
+    }
 
     static final String PRODUTO = "Produto";
     static final String ID = "id";

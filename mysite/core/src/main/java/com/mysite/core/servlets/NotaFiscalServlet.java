@@ -12,6 +12,7 @@ import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.HttpConstants;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -35,8 +36,12 @@ import static org.apache.sling.api.servlets.ServletResolverConstants.*;
 })
 public class NotaFiscalServlet extends SlingAllMethodsServlet {
 
-    @Reference
-    private NotaFiscalService notaFiscalService;
+    private final NotaFiscalService notaFiscalService;
+
+    @Activate
+    public NotaFiscalServlet(@Reference NotaFiscalService notaFiscalService) {
+        this.notaFiscalService = notaFiscalService;
+    }
 
     static final String PARAMETER = "Número da Nota ou ID do Cliente";
     static final String NUMERO = "numero";
@@ -58,6 +63,7 @@ public class NotaFiscalServlet extends SlingAllMethodsServlet {
         catch(IdNotFoundException e){buildResponse(response, SC_NOT_FOUND, e.getMessage());}
     }
 
+
     @Override
     protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws ServletException, IOException {
         try{
@@ -74,5 +80,6 @@ public class NotaFiscalServlet extends SlingAllMethodsServlet {
         }catch (InvalidValueException e){buildResponse(response,SC_BAD_REQUEST,e.getMessage());}
         catch (PostException e){buildResponse(response,SC_INTERNAL_SERVER_ERROR,postFailed(e.getMessage()));}
         catch (Exception e){buildResponse(response,SC_BAD_REQUEST,invalidPayload(NOTA_FISCAL));}
+
     }
 }

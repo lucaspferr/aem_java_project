@@ -10,6 +10,7 @@ import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.HttpConstants;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -34,9 +35,12 @@ import static org.apache.sling.api.servlets.ServletResolverConstants.*;
 })
 public class ClienteServlet extends SlingAllMethodsServlet {
 
-    @Reference
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
 
+    @Activate
+    public ClienteServlet(@Reference ClienteService clienteService) {
+        this.clienteService = clienteService;
+    }
 
     static final String CLIENTE = "Cliente";
     static final String ID = "id";
