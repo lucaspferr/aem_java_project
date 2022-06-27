@@ -10,6 +10,7 @@ import com.mysite.core.models.Cliente;
 import com.mysite.core.models.IdList;
 import com.mysite.core.service.ClienteService;
 import com.mysite.core.service.DatabaseService;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -23,8 +24,13 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Reference
     private DatabaseService databaseService;
-    @Reference
-    private ClienteDAO clienteDAO;
+
+    private final ClienteDAO clienteDAO;
+
+    @Activate
+    public ClienteServiceImpl(@Reference ClienteDAO clienteDAO){
+        this.clienteDAO = clienteDAO;
+    }
 
     static final String CLIENTE = "Cliente";
     static final String NOME = "nome";

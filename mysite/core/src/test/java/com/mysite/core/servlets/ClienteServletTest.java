@@ -315,6 +315,38 @@ public class ClienteServletTest {
         assertEquals("", response.getOutputAsString());
     }
 
+    @Test
+    void deleteClienteBadPayload(){
+        request.setPathInfo(DELETE);
+        request.setContent(BAD_PAYLOAD.getBytes());
+        request.setContentType(CONTENT);
+        request.setMethod(DELETE);
+        when(clienteService.idListOrObject(BAD_PAYLOAD)).thenThrow(new InvalidValueException(invalidPayload(CLIENTE)));
+
+        try {
+            clienteServlet.doDelete(request, response);
+        } catch (ServletException | IOException e) {e.printStackTrace();}
+        assertEquals(SC_BAD_REQUEST, response.getStatus());
+        assertEquals(CONTENT, response.getContentType());
+        assertEquals(invalidPayload(CLIENTE), response.getOutputAsString());
+    }
+
+    @Test
+    void deleteClientIdNotExist(){
+        request.setPathInfo(PATH);
+        request.setContent(SING_ID.getBytes());
+        request.setContentType(CONTENT);
+        request.setMethod(DELETE);
+        ids.add(1);
+        when(clienteService.idListOrObject(SING_ID)).thenThrow(new IdNotFoundException(idNotFound(SING_ID, CLIENTE,"")));
+        try {
+            clienteServlet.doDelete(request, response);
+        } catch (ServletException | IOException e) {e.printStackTrace();}
+        assertEquals(SC_NOT_FOUND, response.getStatus());
+        assertEquals(CONTENT, response.getContentType());
+        assertEquals(idNotFound(SING_ID, CLIENTE,""), response.getOutputAsString());
+    }
+
 
     //----------------------- CREATOR -----------------------------
 
