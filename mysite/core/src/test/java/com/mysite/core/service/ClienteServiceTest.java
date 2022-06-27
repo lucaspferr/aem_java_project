@@ -23,8 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.mysite.core.utils.BuildResponse.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -46,6 +45,7 @@ class ClienteServiceTest {
     static final String CLIENTE = "Cliente";
     static final String ID = "id";
     static final String EMPTY = "";
+    static final String NOME = "nome";
 
     @BeforeEach
     void setUp(AemContext context) {
@@ -63,7 +63,7 @@ class ClienteServiceTest {
     @Test
     void idCheckerShouldReturnTrue() {
         when(clienteDAO.getClienteById(1)).thenReturn(cliente);
-        assertEquals(true, clienteService.idChecker(cliente.getId()));
+        assertTrue(clienteService.idChecker(cliente.getId()));
     }
 
     @Test
@@ -80,6 +80,35 @@ class ClienteServiceTest {
 
         Exception exception = assertThrows(InvalidValueException.class, () -> clienteService.idChecker(1));
         assertEquals(invalidPayloadDetailed(CLIENTE, ID), exception.getMessage());
+    }
+
+    @Test
+    void objectCheckerShouldReturnList(){
+        assertEquals(clientes, clienteService.objectChecker(clientes));
+    }
+
+    @Test
+    void objectCheckerShouldThrowInvalidValueExceptionBecauseNomeIsEmpty(){
+        //Test with empty String
+        List<Cliente> clientes = Arrays.asList(new Cliente(1, CLIENTE), new Cliente(2, EMPTY));
+        Exception exception = assertThrows(InvalidValueException.class, () -> clienteService.objectChecker(clientes));
+        assertEquals(invalidPayloadDetailed(CLIENTE, NOME), exception.getMessage());
+    }
+
+    @Test
+    void objectCheckerShouldThrowInvalidValueExceptionBecauseNomeIsNull(){
+        //Test with null value
+        List<Cliente> clientes = Arrays.asList(new Cliente(1, CLIENTE), new Cliente(2, EMPTY));
+        Exception exception = assertThrows(InvalidValueException.class, () -> clienteService.objectChecker(clientes));
+        assertEquals(invalidPayloadDetailed(CLIENTE, NOME), exception.getMessage());
+    }
+
+    @Test
+    void updateCheckerShouldReturnList(){
+        for(int i = 0; i < clientes.size(); i++){
+            when(clienteDAO.getClienteById(i+1)).thenReturn(clientes.get(i));
+        }
+        assertEquals(clientes, clienteService.updateChecker(clientes));
     }
 
 
